@@ -1,0 +1,50 @@
+#!/bin/bash
+#
+# advanced-minecraft-init-script - An initscript to start Minecraft or CraftBukkit
+# Setup part of advanced-minecraft-init-script
+# In this file you setup variables used by minecraft-init-script
+# Oryginal minecraft-init-script created by Super Jamie <jamie@superjamie.net>
+# Copyright (C) 2013 - Asda Pazda <asda.pazda1@gmail.com>
+#
+#
+## Settings
+# Nice looking name of service for script to report back to users
+SERVERNAME="Bedrock"
+# Filename of server binary
+SERVICE="craftbukkit-1.4.7-R1.0.jar"
+# Username of non-root user who will run the server
+USERNAME="minecraft"
+# Path of server binary and world
+MCPATH="/home/minecraft/bukkit"
+# Number of CPU cores to thread across if using multithreaded garbage collection
+CPU_COUNT=1
+# Where backups go
+BACKUPPATH="/home/minecraft/backups"
+# Find the world name from the existing server file
+WORLDNAME="$(cat $MCPATH/server.properties | grep -E 'level-name' | sed -e s/.*level-name=//)"
+# Find the port number from the existing server file
+SERVERPORT="$(cat $MCPATH/server.properties | grep -E 'server-port' | sed -e s/.*server-port=//)"
+# Name of Screen session
+SCRNAME="bedrock"
+
+# Setting if using mysql or not
+MYSQL=0 # if using mysql leave 0, if not enter anything else
+
+# Settings for mailing admins about error
+WARNLVL="SEVERE|WARNING" # Message you treat as an error: WARNING, SEVERE; add whatever you want delimiter is: |
+EMAIL="bambi@bedrock.com.pl" # Email addresses
+
+## The Java command to run the server
+
+# Nothing special, just start the server with 1Gb RAM
+# INVOCATION="java -Xms1024M -Xmx1024M -Djava.net.preferIPv4Stack=true -jar $SERVICE nogui"
+
+# This is what I run my server with. Tune your RAM usage accordingly
+# Tested fastest GC - Default parallel new gen collector, plus parallel old gen collector
+
+INVOCATION="java -Xms800M -Xmx800M -Djava.net.preferIPv4Stack=true -jar $SERVICE nogui"
+
+#INVOCATION="java -Xms800M -Xmx800M -XX:+UseParallelGC -Djava.net.preferIPv4Stack=true -jar $SERVICE nogui"
+
+# I removed these "performance" commands as I don't see any difference with them
+# -XX:+UseFastAccessorMethods -XX:+AggressiveOpts -XX:+UseAdaptiveGCBoundary
