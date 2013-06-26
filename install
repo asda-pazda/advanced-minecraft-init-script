@@ -1,0 +1,57 @@
+#!/bin/bash
+
+echo "Instalation script for advanced-minecraft-init-script"
+echo "More info on github (https://github.com/asda-pazda/advanced-minecraft-init-script)"
+echo "This script will generate SETTINGStmp for your Minecraft server, you can download this script form github and edit it manually"
+echo ""
+echo "Input your desired Server name" #Nice looking name of service for script to report back to users
+read SERVERNAME
+echo "SERVERNAME=\"$SERVERNAME\"" > SETTINGStmp
+echo "Input filename of server binary"
+read SERVICE
+echo "SERVICE=\"$SERVICE\"" >> SETTINGStmp
+echo "Input non-root user who will run the server"
+read USERNAME
+echo "USERNAME=\"$USERNAME\"" >> SETTINGStmp
+echo "Input path of server binary and world"
+read MCPATH
+echo "MCPATH=\"$MCPATH\"" >> SETTINGStmp
+echo "Input number of CPU cores to thread across if using multithreaded garbage collection"
+read CPU_COUNT
+if ! [[ "$CPU_COUNT" =~ ^[0-9]+$ ]] ; then
+   exec >&2; echo "error: Not a number";rm SETTINGStmp; exit 1;
+fi
+echo "CPU_COUNT=$CPU_COUNT" >> SETTINGStmp
+echo "Input path where backups go"
+read BACKUPPATH
+echo "BACKUPPATH=\"$BACKUPPATH\"" >> SETTINGStmp
+echo "Input screen name"
+read SCRNAME
+echo "SCRNAME=\"$SCRNAME\"" >> SETTINGStmp
+echo "If using MySql input 0, if not leave empty"
+read MYSQL
+echo "MYSQL=$MYSQL" >> SETTINGStmp
+
+echo "Do you want to be mailed upon error? [Y/n]"
+read WARN
+
+if [[ $WARN == 'Y' ]]; then
+	echo "Input Warning Level default is : SEVERE, WARNING. You can later modify it"
+	WARNLVL="SEVERE|WARNING"
+	echo "WARNLVL=\"$WARNLVL\"" >> SETTINGStmp
+	echo "Input email address"
+	read EMAIL
+	echo "EMAIL=\"$EMAIL\"" >> SETTINGStmp
+fi
+
+echo "Now comes to java invocation, input amount of RAM (in MB) you assign to server"
+read RAM
+if ! [[ "$RAM" =~ ^[0-9]+$ ]] ; then
+   exec >&2; echo "error: Not a number"; exit 1
+fi
+
+INVOCATION="java -Xms${RAM}M -Xmx${RAM}M -Djava.net.preferIPv4Stack=true -jar $SERVICE nogui"
+echo "INVOCATION=\"$INVOCATION\"" >> SETTINGStmp
+
+echo 'WORLDNAME="$(cat $MCPATH/server.properties | grep -E '\'level-name\'' | sed -e s/.*level-name=//)"' >> SETTINGStmp
+echo 'SERVERPORT="$(cat $MCPATH/server.properties | grep -E '\'server-port\'' | sed -e s/.*server-port=//)"' >> SETTINGStmp
